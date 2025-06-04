@@ -5,162 +5,315 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Firebase Admin Panel</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Include Firebase libraries -->
+    <!-- Include libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Reset some default browser styles */
-        body, h1, p, input, button {
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --error: #ef233c;
+            --success: #4cc9f0;
+            --text: #2b2d42;
+            --text-light: #8d99ae;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Body styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-        }
-
-        /* Container styling */
-        .container {
-            background-color: #fff;
+            min-height: 100vh;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem;
             text-align: center;
+            transition: var(--transition);
         }
 
-        /* Form styling */
-        form {
-            display: flex;
-            flex-direction: column;
+        .logo {
+            margin-bottom: 1.5rem;
         }
 
-        /* Input styling */
-        input[type="text"],
-        input[type="password"] {
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 100%; /* Ensure inputs take full width */
+        .logo i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Show/hide button styling */
+        .title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
         .show-password {
             display: flex;
             align-items: center;
-            margin-top: 5px;
-            justify-content: center; /* Center align the checkbox and label */
-        }
-
-        .show-password input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        /* Button styling */
-        button {
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--text-light);
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
+            user-select: none;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .show-password input {
+            width: auto;
+            margin-right: 8px;
+            padding: 0;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
         }
 
-        /* Error message styling */
-        #error-message {
-            margin-top: 10px;
-            font-size: 14px;
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 1rem;
         }
 
-        /* Icon styling */
-        h1 i {
-            margin-right: 10px;
-            color: #007bff; /* Customize the color */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Timer styling */
-        #timer {
-            margin-top: 10px;
-            font-size: 14px;
-            color: red;
+        .btn i {
+            margin-right: 8px;
+            font-size: 0.9rem;
         }
 
-        /* Remaining attempts styling */
-        #remaining-attempts {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-error {
+            background-color: rgba(239, 35, 60, 0.1);
+            color: var(--error);
+        }
+
+        .alert i {
+            margin-right: 8px;
+        }
+
+        .timer, .remaining-attempts {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .timer {
+            color: var(--error);
+        }
+
+        .remaining-attempts {
+            color: var(--text-light);
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            input, .btn {
+                padding: 12px 12px 12px 40px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-user-shield"></i></h1>
-        <form id="login-form">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <div class="show-password">
-                <input type="checkbox" id="show-password">
-                <label for="show-password">Show Password</label>
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
             </div>
-            <button type="submit">Login</button>
-            <button type="button" id="change-password-btn">Change Password</button>
-            <p id="error-message" style="color: red;"></p>
-            <p id="timer"></p>
-            <p id="remaining-attempts"></p>
-        </form>
+            <h1 class="title">Admin Portal</h1>
+            <p class="subtitle">Secure access to your dashboard</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="show-password">
+                        <input type="checkbox" id="show-password">
+                        <label for="show-password">Show Password</label>
+                    </div>
+                </div>
+                
+                <div id="error-message" class="alert alert-error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="message"></span>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button type="button" id="change-password-btn" class="btn btn-secondary">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                </div>
+                
+                <div id="timer" class="timer"></div>
+                <div id="remaining-attempts" class="remaining-attempts"></div>
+            </form>
+            
+            <div class="footer">
+                <p>© 2023 Admin Panel. All rights reserved.</p>
+            </div>
+        </div>
     </div>
 
     <script>
-    const firebaseConfig = {
-  apiKey: "AIzaSyCQHiJOWAmn3aDSktr3K2dYpKrFOj3ATVY",
-  authDomain: "hddd-2d7cc.firebaseapp.com",
-  databaseURL: "https://hddd-2d7cc-default-rtdb.firebaseio.com",
-  projectId: "hddd-2d7cc",
-  storageBucket: "hddd-2d7cc.firebasestorage.app",
-  messagingSenderId: "421872663949",
-  appId: "1:421872663949:web:3b8e384c7c1488249c11c4",
-  measurementId: "G-W54QCSMY13"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyCQHiJOWAmn3aDSktr3K2dYpKrFOj3ATVY",
+            authDomain: "hddd-2d7cc.firebaseapp.com",
+            databaseURL: "https://hddd-2d7cc-default-rtdb.firebaseio.com",
+            projectId: "hddd-2d7cc",
+            storageBucket: "hddd-2d7cc.appspot.com",
+            messagingSenderId: "421872663949",
+            appId: "1:421872663949:web:3b8e384c7c1488249c11c4",
+            measurementId: "G-W54QCSMY13"
+        };
 
         // Encryption function
         function encrypt(text, key) {
             return CryptoJS.AES.encrypt(text, key).toString();
         }
 
-        // Decryption function
-        function decrypt(encryptedText, key) {
-            const bytes = CryptoJS.AES.decrypt(encryptedText, key);
-            return bytes.toString(CryptoJS.enc.Utf8);
-        }
-
-        // Key for encryption (should be kept secret)
-        const encryptionKey = '8hTygdnl'; 
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        // Get references to the form, error message element, and timer
+        // DOM elements
         const loginForm = document.getElementById('login-form');
-        const errorMessage = document.getElementById('error-message');
+        const errorMessage = document.querySelector('#error-message .message');
+        const errorAlert = document.getElementById('error-message');
         const showPasswordCheckbox = document.getElementById('show-password');
         const passwordInput = document.getElementById('password');
         const changePasswordBtn = document.getElementById('change-password-btn');
@@ -173,6 +326,7 @@
         const attemptsKey = 'loginAttempts';
         const blockedKey = 'isBlocked';
         const blockStartTimeKey = 'blockStartTime';
+        const encryptionKey = '8hTygdnl';
 
         // Retrieve stored values
         let loginAttempts = parseInt(localStorage.getItem(attemptsKey)) || 0;
@@ -184,7 +338,7 @@
         function updateTimer(remainingTime) {
             const minutes = Math.floor(remainingTime / 60);
             const seconds = remainingTime % 60;
-            timerDisplay.textContent = `Blocked for: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timerDisplay.textContent = `Account locked. Try again in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
         // Function to handle blocking and countdown
@@ -203,23 +357,38 @@
                 if (remainingTime <= 0) {
                     clearInterval(countdownInterval);
                     isBlocked = false;
-                    loginAttempts = 1; // Set remaining attempts to 1 after unblocking
+                    loginAttempts = 1;
                     localStorage.removeItem(blockedKey);
                     localStorage.removeItem(blockStartTimeKey);
                     localStorage.setItem(attemptsKey, loginAttempts);
                     updateRemainingAttempts();
                     timerDisplay.textContent = "";
-                    errorMessage.textContent = "";
+                    hideError();
                 } else {
                     updateTimer(remainingTime);
                 }
-            }, 1000); // Update every second
+            }, 1000);
         }
 
         // Function to update and display the remaining attempts
         function updateRemainingAttempts() {
             const remainingAttempts = maxAttempts - loginAttempts;
-            remainingAttemptsDisplay.textContent = `Remaining attempts: ${remainingAttempts}`;
+            if (remainingAttempts < maxAttempts) {
+                remainingAttemptsDisplay.textContent = `${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining`;
+            } else {
+                remainingAttemptsDisplay.textContent = "";
+            }
+        }
+
+        // Function to show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'flex';
+        }
+
+        // Function to hide error message
+        function hideError() {
+            errorAlert.style.display = 'none';
         }
 
         // Initial setup based on current status
@@ -228,11 +397,10 @@
             const currentTime = Math.floor(Date.now() / 1000);
             const elapsedTime = currentTime - blockStartTime;
             if (elapsedTime < blockDuration) {
-                handleBlocking(); // Resume countdown if still blocked
+                handleBlocking();
             } else {
-                // Unblock and reset values
                 isBlocked = false;
-                loginAttempts = 1; // Set remaining attempts to 1 after unblocking
+                loginAttempts = 1;
                 localStorage.removeItem(blockedKey);
                 localStorage.removeItem(blockStartTimeKey);
                 localStorage.setItem(attemptsKey, loginAttempts);
@@ -250,7 +418,7 @@
             e.preventDefault();
 
             if (isBlocked) {
-                errorMessage.textContent = "Please wait until your IP is unblocked.";
+                showError("Too many attempts. Please wait before trying again.");
                 return;
             }
 
@@ -275,11 +443,13 @@
                 } else {
                     loginAttempts++;
                     localStorage.setItem(attemptsKey, loginAttempts);
-                    updateRemainingAttempts(); // Update the remaining attempts
+                    updateRemainingAttempts();
+                    
                     if (loginAttempts >= maxAttempts) {
                         handleBlocking();
+                        showError("Too many failed attempts. Your account has been temporarily locked.");
                     } else {
-                        errorMessage.textContent = "Invalid username or password.";
+                        showError("Invalid username or password. Please try again.");
                     }
                 }
             });
@@ -287,7 +457,7 @@
 
         // Add event for change password button
         changePasswordBtn.addEventListener('click', () => {
-            window.location.href = 'changepass.html'; // Redirect to the change password page
+            window.location.href = 'changepass.html';
         });
     </script>
 </body>

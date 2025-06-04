@@ -4,128 +4,303 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change Password - Firebase Admin Panel</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Include Firebase libraries -->
+    
+    <!-- Include libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Reset some default browser styles */
-        body, h1, p, input, button {
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --error: #ef233c;
+            --success: #06d6a0;
+            --text: #2b2d42;
+            --text-light: #8d99ae;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Body styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-        }
-
-        /* Container styling */
-        .container {
-            background-color: #fff;
+            min-height: 100vh;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .password-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem;
             text-align: center;
+            transition: var(--transition);
         }
 
-        /* Form styling */
-        form {
-            display: flex;
-            flex-direction: column;
+        .logo {
+            margin-bottom: 1.5rem;
         }
 
-        /* Input styling */
-        input[type="password"] {
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .logo i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Button styling */
-        button {
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
+        .title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .btn i {
+            margin-right: 8px;
+            font-size: 0.9rem;
         }
 
-        /* Error message styling */
-        #error-message,
-        #success-message {
-            margin-top: 10px;
-            font-size: 14px;
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
         }
 
-        #error-message {
-            color: red;
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
         }
 
-        #success-message {
-            color: green;
+        .alert {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-error {
+            background-color: rgba(239, 35, 60, 0.1);
+            color: var(--error);
+        }
+
+        .alert-success {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .alert i {
+            margin-right: 8px;
+        }
+
+        .password-strength {
+            margin-top: -10px;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: left;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 480px) {
+            .password-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            input, .btn {
+                padding: 12px 12px 12px 40px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Change Password</h1>
-        <form id="change-password-form">
-            <input type="password" id="current-password" placeholder="Current Password" required>
-            <input type="password" id="new-password" placeholder="New Password" required>
-            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
-            <button type="submit">Change Password</button>
-            <p id="error-message"></p>
-            <p id="success-message"></p>
-        </form>
+        <div class="password-card">
+            <div class="logo">
+                <i class="fas fa-key"></i>
+            </div>
+            <h1 class="title">Change Password</h1>
+            <p class="subtitle">Secure your account with a new password</p>
+            
+            <form id="change-password-form">
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="current-password" placeholder="Current Password" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="new-password" placeholder="New Password" required>
+                    </div>
+                    <p class="password-strength">Use at least 8 characters with a mix of letters, numbers and symbols</p>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                    </div>
+                </div>
+                
+                <div id="error-message" class="alert alert-error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="message"></span>
+                </div>
+                
+                <div id="success-message" class="alert alert-success" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="message"></span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update Password
+                </button>
+            </form>
+            
+            <div class="footer">
+                <p>© 2023 Admin Panel. All rights reserved.</p>
+            </div>
+        </div>
     </div>
 
     <script>
-     const firebaseConfig = {
-  apiKey: "AIzaSyCQHiJOWAmn3aDSktr3K2dYpKrFOj3ATVY",
-  authDomain: "hddd-2d7cc.firebaseapp.com",
-  databaseURL: "https://hddd-2d7cc-default-rtdb.firebaseio.com",
-  projectId: "hddd-2d7cc",
-  storageBucket: "hddd-2d7cc.firebasestorage.app",
-  messagingSenderId: "421872663949",
-  appId: "1:421872663949:web:3b8e384c7c1488249c11c4",
-  measurementId: "G-W54QCSMY13"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyCQHiJOWAmn3aDSktr3K2dYpKrFOj3ATVY",
+            authDomain: "hddd-2d7cc.firebaseapp.com",
+            databaseURL: "https://hddd-2d7cc-default-rtdb.firebaseio.com",
+            projectId: "hddd-2d7cc",
+            storageBucket: "hddd-2d7cc.appspot.com",
+            messagingSenderId: "421872663949",
+            appId: "1:421872663949:web:3b8e384c7c1488249c11c4",
+            measurementId: "G-W54QCSMY13"
+        };
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        // Get references to the form and message elements
+        // DOM elements
         const changePasswordForm = document.getElementById('change-password-form');
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.querySelector('#error-message .message');
+        const errorAlert = document.getElementById('error-message');
+        const successMessage = document.querySelector('#success-message .message');
+        const successAlert = document.getElementById('success-message');
 
         // Add change password event
         changePasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Clear previous messages
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
 
             // Get current and new passwords
             const currentPassword = document.getElementById('current-password').value;
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
 
+            // Validate passwords
             if (newPassword !== confirmPassword) {
                 errorMessage.textContent = "New password and confirm password do not match.";
+                errorAlert.style.display = 'flex';
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                errorMessage.textContent = "Password must be at least 8 characters long.";
+                errorAlert.style.display = 'flex';
                 return;
             }
 
@@ -138,16 +313,31 @@
                 if (userData && userData.password === currentPassword) {
                     // Update password in Firebase Realtime Database
                     await userRef.update({ password: newPassword });
+                    
+                    // Show success message
                     successMessage.textContent = "Password changed successfully!";
-                    errorMessage.textContent = "";
+                    successAlert.style.display = 'flex';
+                    
+                    // Clear form fields
+                    changePasswordForm.reset();
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(() => {
+                        successAlert.style.display = 'none';
+                    }, 3000);
                 } else {
                     errorMessage.textContent = "Current password is incorrect.";
-                    successMessage.textContent = "";
+                    errorAlert.style.display = 'flex';
                 }
             } catch (error) {
                 errorMessage.textContent = "An error occurred: " + error.message;
-                successMessage.textContent = "";
+                errorAlert.style.display = 'flex';
             }
+        });
+
+        // Add password strength indicator (optional enhancement)
+        document.getElementById('new-password').addEventListener('input', function() {
+            // You can add password strength meter logic here
         });
     </script>
 </body>
